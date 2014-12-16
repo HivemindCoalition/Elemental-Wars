@@ -133,14 +133,25 @@ if(room == test_room)
           <argument>
             <kind>1</kind>
             <string>///Menu UI
+current_Menu = 2;
 if(room == menu)
 {
     if(current_Menu == 0)//no menu
     {
     }
-    if(current_Menu == 1)//game start screen
+    else if(current_Menu == 1)//game start screen
     {
         draw_sprite(Button_Start,0,250,400);
+        draw_text(350,465, "Start Game");
+    }
+    else if(current_Menu == 2)//game start screen
+    {
+        draw_sprite(Button_Start,0,250,25);
+        draw_text(350,90, "Start Game");
+        draw_sprite(Button_Start,0,250,225);
+        draw_text(350,290, "Continue Game");
+        draw_sprite(Button_Start,0,250,425);
+        draw_text(350,490, "Settings");
     }
 }
 </string>

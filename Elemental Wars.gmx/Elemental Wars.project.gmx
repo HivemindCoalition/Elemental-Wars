@@ -11,21 +11,24 @@
     <sprite>sprites\Button_Menu</sprite>
     <sprite>sprites\Button_Start</sprite>
     <sprite>sprites\Wall_Stone</sprite>
-    <sprite>sprites\sprite3</sprite>
+    <sprite>sprites\Player_Placeholder</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
-  <scripts name="scripts"/>
   <objects name="objects">
-    <object>objects\Game_Controller</object>
+    <object>objects\Player</object>
     <object>objects\Wall</object>
+    <objects name="Controllers">
+      <object>objects\Game_Controller</object>
+      <object>objects\Player_Contoller</object>
+    </objects>
   </objects>
   <rooms name="rooms">
-    <room>rooms\menu</room>
     <room>rooms\test_room</room>
+    <room>rooms\menu</room>
   </rooms>
   <constants number="2">
-    <constant name="GM_build_date">41989.8948519792</constant>
+    <constant name="GM_build_date">41989.9121226273</constant>
     <constant name="GM_version">'1.0.0.0'</constant>
   </constants>
   <help>
