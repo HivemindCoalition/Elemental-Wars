@@ -1,0 +1,13 @@
+GameController is the first object, and keeps track of the general state of the game
+
+Behaviors - Creates and keeps track of other controllers
+
+Attributes -
+
+UI_Controller
+Attributes
+- Current UI
+- initialized
+
+Behaviors
+- keeps track of which UI's are active
