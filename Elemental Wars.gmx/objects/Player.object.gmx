@@ -26,9 +26,44 @@
           <argument>
             <kind>1</kind>
             <string>///Initialization variables
+
+//resource stats
 current_health = 100;
+max_health = 100;
 current_stam = 100;
+max_stam = 100;
 current_SE = 100;
+max_SE = 100;
+curr_phys_endur = 100;
+max_phys_endur = 100;
+curr_meta_endur = 100;
+max_meta_endur = 100;
+
+//facing/aiming properties
+facing_dir = 0;//can be either left or right, based on mouse position from player
+aiming_dir = 0;//can be 0-359, and based on mouse position from player
+
+//physics properties
+weight = 100;
+momentum_for = 0;
+momentum_dir = 0;
+
+//base stats
+max_strength = 10;
+avail_str = 10;
+max_agi = 10;
+avail_agi = 10;
+max_dex = 10;
+avail_dex = 10;
+max_int = 10;
+avail_int = 10;
+max_spi = 10;
+avail_spi = 10;
+
+//state machine variables
+basic_move_state = 0;
+acrobat_move_state = 0;
+combat_move_state = 0;
 </string>
           </argument>
         </arguments>
@@ -55,6 +90,9 @@ current_SE = 100;
 
 /*
 Basic Movement State Machine
+all movement is:
+in the direction of facing if moving foward
+in the opposite direction of facing if moving backwards
 0 = nothing
 1 = walking
 2 = running
@@ -62,6 +100,41 @@ Basic Movement State Machine
 */
 
 switch(basic_move_state)
+{
+    case 0:
+    break;
+    case 1:
+    break;
+    case 2:
+    break;
+    case 3:
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Aiming/facing direction
+
+/*
+This code gets mouse info from player controller
+and uses it to set aiming/facing direction
+/*
 </string>
           </argument>
         </arguments>
