@@ -31,6 +31,57 @@ is_player = 1;
           </argument>
         </arguments>
       </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Timer Initialization
+DT_timer_active = 0;
+DT_timer_threshold = 60; //.5 second double tap window
+DT_timer_count = 0;
+DT_press_count = 0;//tracks how many times a button is tapped up to 2
+
+shift_toggle = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Test Init
+sprinting = 0;
+running = 0;
+walking = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
     </event>
     <event eventtype="3" enumb="1">
       <action>
@@ -57,14 +108,52 @@ Double tap toggles sprint
 */
 if(keyboard_check(vk_shift))
 {
+    shift_toggle = 1;//toggles walking
+}
+else if(!keyboard_check(vk_shift))
+{
+    shift_toggle = 0;//toggles walking
 }
 
-if(keyboard_check_pressed(ord("A")))
+if(keyboard_check_pressed(ord("A")) &amp;&amp; (DT_timer_count &lt; DT_timer_threshold)
+ &amp;&amp; DT_press_count &gt; 0)
 {
+    DT_press_count++;
 }
-if(keyboard_check(ord("A")))
+else if(keyboard_check_pressed(ord("A")))
 {
+    DT_timer_active = 1;
+    DT_press_count++;
 }
+if(keyboard_check(ord("A")) &amp;&amp; shift_toggle == 1)
+{
+    //activate walk
+    Player.basic_move_state = 1;
+    walking = 1;
+    sprinting = 0;
+    running = 0;
+}
+else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count &gt;= 2)
+{
+    //activate sprint
+    sprinting = 1;
+    Player.basic_move_state = 3;
+}
+else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count &lt; 2)
+{
+    //activate run
+    running = 1;
+    Player.basic_move_state = 2;
+    walking = 0;
+}
+else
+{
+    sprinting = 0;
+    running = 0;
+    Player.basic_move_state = 0;
+    walking = 0;
+}
+
 
 if(keyboard_check(ord("D")))
 {
@@ -98,6 +187,40 @@ if(keyboard_check(ord("S")))
           <argument>
             <kind>1</kind>
             <string>///Mouse Tracking
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Timer Behavior
+if(DT_timer_active == 1)
+{
+        DT_timer_count++;
+}
+if(DT_timer_count &gt;= DT_timer_threshold)
+{
+    DT_timer_active = 0;
+    DT_timer_count = 0;
+}
+if(DT_timer_active == 0 &amp;&amp; !keyboard_check(ord("A")))
+{
+    DT_press_count = 0;
+}
 </string>
           </argument>
         </arguments>

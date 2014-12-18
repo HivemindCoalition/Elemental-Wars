@@ -86,28 +86,21 @@ combat_move_state = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Basic Movement State Machine
+            <string>///Aiming/facing direction
 
 /*
-Basic Movement State Machine
-all movement is:
-in the direction of facing if moving foward
-in the opposite direction of facing if moving backwards
-0 = nothing
-1 = walking
-2 = running
-3 = sprinting
+This code gets mouse info from player controller
+and uses it to set aiming/facing direction
 */
 
-switch(basic_move_state)
+aiming_dir = point_direction(x,y,mouse_x,mouse_y);
+if(aiming_dir &gt; 270 || aiming_dir &lt; 90)
 {
-    case 0:
-    break;
-    case 1:
-    break;
-    case 2:
-    break;
-    case 3:
+    facing_dir = 0;
+}
+else
+{
+    facing_dir = 180;
 }
 </string>
           </argument>
@@ -129,12 +122,39 @@ switch(basic_move_state)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Aiming/facing direction
+            <string>///Basic Movement State Machine
 
 /*
-This code gets mouse info from player controller
-and uses it to set aiming/facing direction
+Basic Movement State Machine
+all movement is:
+in the direction of facing if moving foward
+in the opposite direction of facing if moving backwards
+0 = nothing
+1 = walking
+2 = running - can only run going forwards
+3 = sprinting - can only sprint going fowards
+*/
+
 /*
+Players running speed will accelerate until maximum move speed is reached
+*/
+
+switch(basic_move_state)
+{
+    case 0:
+    break;
+    case 1:
+    x++;
+    break;
+    case 2:
+    x=x+2;
+    break;
+    case 3:
+    x=x+3;
+    break;
+    default:
+    ;
+}
 </string>
           </argument>
         </arguments>
