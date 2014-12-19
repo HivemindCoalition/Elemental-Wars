@@ -48,10 +48,16 @@ is_player = 1;
           <argument>
             <kind>1</kind>
             <string>///Timer Initialization
-DT_timer_active = 0;
-DT_timer_threshold = 60; //.5 second double tap window
-DT_timer_count = 0;
-DT_press_count = 0;//tracks how many times a button is tapped up to 2
+//A key
+DT_timer_active_A = 0;
+DT_timer_threshold_A = 60; //.5 second double tap window
+DT_timer_count_A = 0;
+DT_press_count_A = 0;//tracks how many times a button is tapped up to 2
+//D key
+DT_timer_active_D = 0;
+DT_timer_threshold_D = 60; //.5 second double tap window
+DT_timer_count_D = 0;
+DT_press_count_D = 0;//tracks how many times a button is tapped up to 2
 
 shift_toggle = 0;
 </string>
@@ -114,17 +120,32 @@ else if(!keyboard_check(vk_shift))
 {
     shift_toggle = 0;//toggles walking
 }
-
-if(keyboard_check_pressed(ord("A")) &amp;&amp; (DT_timer_count &lt; DT_timer_threshold)
- &amp;&amp; DT_press_count &gt; 0)
+//Starting 'A' Timer
+if(keyboard_check_pressed(ord("A")) &amp;&amp; (DT_timer_count_A &lt; DT_timer_threshold_A)
+ &amp;&amp; DT_press_count_A &gt; 0)
 {
-    DT_press_count++;
+    DT_press_count_A++;
 }
 else if(keyboard_check_pressed(ord("A")))
 {
-    DT_timer_active = 1;
-    DT_press_count++;
+    DT_timer_active_A = 1;
+    DT_press_count_A++;
 }
+//Starting 'D' Timer
+if(keyboard_check_pressed(ord("D")) &amp;&amp; (DT_timer_count_D &lt; DT_timer_threshold_D)
+ &amp;&amp; DT_press_count_D &gt; 0)
+{
+    DT_press_count_D++;
+}
+else if(keyboard_check_pressed(ord("D")))
+{
+    DT_timer_active_D = 1;
+    DT_press_count_D++;
+}
+
+
+
+//'A' key interaction
 if(keyboard_check(ord("A")) &amp;&amp; shift_toggle == 1)
 {
     //activate walk
@@ -133,17 +154,39 @@ if(keyboard_check(ord("A")) &amp;&amp; shift_toggle == 1)
     sprinting = 0;
     running = 0;
 }
-else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count &gt;= 2)
+else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count_A &gt;= 2)
 {
     //activate sprint
     sprinting = 1;
     Player.basic_move_state = 3;
 }
-else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count &lt; 2)
+else if(keyboard_check(ord("A")) &amp;&amp; DT_press_count_A &lt; 2)
 {
     //activate run
     running = 1;
     Player.basic_move_state = 2;
+    walking = 0;
+}
+//'D' key interaction
+else if(keyboard_check(ord("D")) &amp;&amp; shift_toggle == 1)
+{
+    //activate walk
+    Player.basic_move_state = 4;
+    walking = 1;
+    sprinting = 0;
+    running = 0;
+}
+else if(keyboard_check(ord("D")) &amp;&amp; DT_press_count_D &gt;= 2)
+{
+    //activate sprint
+    sprinting = 1;
+    Player.basic_move_state = 6;
+}
+else if(keyboard_check(ord("D")) &amp;&amp; DT_press_count_D &lt; 2)
+{
+    //activate run
+    running = 1;
+    Player.basic_move_state = 5;
     walking = 0;
 }
 else
@@ -153,7 +196,6 @@ else
     Player.basic_move_state = 0;
     walking = 0;
 }
-
 
 if(keyboard_check(ord("D")))
 {
@@ -207,19 +249,35 @@ if(keyboard_check(ord("S")))
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Timer Behavior
-if(DT_timer_active == 1)
+            <string>///Timers and Behaviors
+//double tap timers
+//A timer
+if(DT_timer_active_A == 1)
 {
-        DT_timer_count++;
+        DT_timer_count_A++;
 }
-if(DT_timer_count &gt;= DT_timer_threshold)
+if(DT_timer_count_A &gt;= DT_timer_threshold_A)
 {
-    DT_timer_active = 0;
-    DT_timer_count = 0;
+    DT_timer_active_A = 0;
+    DT_timer_count_A = 0;
 }
-if(DT_timer_active == 0 &amp;&amp; !keyboard_check(ord("A")))
+if(DT_timer_active_A == 0 &amp;&amp; !keyboard_check(ord("A")))
 {
-    DT_press_count = 0;
+    DT_press_count_A = 0;
+}
+//D timer
+if(DT_timer_active_D == 1)
+{
+        DT_timer_count_D++;
+}
+if(DT_timer_count_D &gt;= DT_timer_threshold_D)
+{
+    DT_timer_active_D = 0;
+    DT_timer_coun_Dt = 0;
+}
+if(DT_timer_active_D == 0 &amp;&amp; !keyboard_check(ord("D")))
+{
+    DT_press_count_D = 0;
 }
 </string>
           </argument>

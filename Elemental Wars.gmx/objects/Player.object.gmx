@@ -39,15 +39,6 @@ max_phys_endur = 100;
 curr_meta_endur = 100;
 max_meta_endur = 100;
 
-//facing/aiming properties
-facing_dir = 0;//can be either left or right, based on mouse position from player
-aiming_dir = 0;//can be 0-359, and based on mouse position from player
-
-//physics properties
-weight = 100;
-momentum_for = 0;
-momentum_dir = 0;
-
 //base stats
 max_strength = 10;
 avail_str = 10;
@@ -64,6 +55,88 @@ avail_spi = 10;
 basic_move_state = 0;
 acrobat_move_state = 0;
 combat_move_state = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Facing/Aiming Initializtion
+
+//facing flags
+facing_right = false;
+facing_left = false;
+
+//facing/aiming properties
+facing_dir = 0;//can be either left or right, based on mouse position from player
+aiming_dir = 0;//can be 0-359, and based on mouse position from player
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Physics Initialization
+
+//physics properties
+weight = 61; //based off metric system
+momentum_for = 0;
+momentum_dir = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Abilities
+//Running
+technique_mobility_running = 1; //abilities will be objects as well down the road
+technique_running_stepSpeed = avail_agi;
+technique_running_stepForce = avail_str;
+
+technique_mobility_sprinting = 1;
 </string>
           </argument>
         </arguments>
@@ -97,10 +170,14 @@ aiming_dir = point_direction(x,y,mouse_x,mouse_y);
 if(aiming_dir &gt; 270 || aiming_dir &lt; 90)
 {
     facing_dir = 0;
+    facing_right = true;
+    facing_left = false;
 }
 else
 {
     facing_dir = 180;
+    facing_left = true;
+    facing_right = false;
 }
 </string>
           </argument>
@@ -127,12 +204,18 @@ else
 /*
 Basic Movement State Machine
 all movement is:
-in the direction of facing if moving foward
+in the direction of the key pressed
 in the opposite direction of facing if moving backwards
+you are going forward if you are facing the direction you're moving
 0 = nothing
-1 = walking
-2 = running - can only run going forwards
-3 = sprinting - can only sprint going fowards
+1 = walking_left
+2 = running_left - can only run going forwards
+3 = sprinting_lefy - can only sprint going fowards
+4 = walking_right
+5 = running_right - can only run going forwards
+6 = sprinting_right - can only sprint going fowards
+
+If you try to run or sprint going backwards, you will just walk
 */
 
 /*
@@ -144,18 +227,114 @@ switch(basic_move_state)
     case 0:
     break;
     case 1:
-    x++;
+        if(facing_left)
+        {
+            x -= 1.5;
+        }
+        else
+        {
+            x -= 1;
+        }
     break;
     case 2:
-    x=x+2;
+        if(facing_left)
+        {
+            x -= 2.5;
+        }
+        else
+        {
+            x -= 1;
+        }
     break;
     case 3:
-    x=x+3;
+        if(facing_left)
+        {
+            x -= 3.5;
+        }
+        else
+        {
+            x -= 1;
+        }
+    break;
+    case 4:
+        if(facing_right)
+        {
+            x += 1.5;
+        }
+        else
+        {
+            x += 1;
+        }
+    break;
+    case 5:
+        if(facing_right)
+        {
+            x += 2.5;
+        }
+        else
+        {
+            x += 1;
+        }
+    break;
+    case 6:
+        if(facing_right)
+        {
+            x += 3.5;
+        }
+        else
+        {
+            x += 1;
+        }
     break;
     default:
     ;
 }
 </string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///physics calculations
+//physics properties
+momentum_for_x = 0;
+momentum_for_y = 0;
+momentum_dir = direction;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string></string>
           </argument>
         </arguments>
       </action>
