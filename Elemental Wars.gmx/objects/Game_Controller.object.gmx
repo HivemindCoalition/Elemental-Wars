@@ -35,13 +35,13 @@ current_Menu = 1;
 UI_scale = 0;
 
 //resource area variables
-res_area_x = 0;
+res_area_x = 100;
 res_area_y = 0;
 res_area_height = 100;
 res_area_width = 300;
 
 //Body health variables
-bod_area_x = res_area_x;
+bod_area_x = 0;
 bod_area_y = res_area_y;
 bod_area_height = 100;
 bod_area_width = 100;
@@ -50,9 +50,9 @@ bod_area_width = 100;
 res_bar_height = 20;
 res_bar_x = 100;
 res_bar_y = 0;
-health_bar_width = 200;
-stam_bar_width = 200;
-meta_bar_width = 200;
+health_bar_width = 300;
+stam_bar_width = 300;
+meta_bar_width = 300;
 </string>
           </argument>
         </arguments>
@@ -82,14 +82,14 @@ if(room == test_room)
     draw_rectangle_color(bod_area_x,bod_area_y,bod_area_x+bod_area_width,bod_area_y+bod_area_height, c_black, c_black, c_black, c_black, true);//outlining body health area
     UI_scale = 0;
     //health
-    draw_rectangle_color(res_bar_x,res_bar_y+0,health_bar_width,res_bar_y+20, c_black, c_black, c_black, c_black, true);
-    draw_rectangle_color(res_bar_x,res_bar_y+0,health_bar_width,res_bar_y+20, c_red, c_red, c_red, c_red, false);
+    draw_rectangle_color(res_bar_x,res_bar_y+0,health_bar_width,res_bar_y+20, c_black, c_black, c_black, c_black, true);//bar border
+    draw_rectangle_color(res_bar_x,res_bar_y+0,res_bar_x+health_bar_width,res_bar_y+20, c_red, c_red, c_red, c_red, false);//bar filling
     //stamina
-    draw_rectangle_color(res_bar_x,res_bar_y+20,stam_bar_width,res_bar_y+40, c_black, c_black, c_black, c_black, true);
-    draw_rectangle_color(res_bar_x,res_bar_y+20,stam_bar_width,res_bar_y+40, c_yellow, c_yellow, c_yellow, c_yellow, false);
+    draw_rectangle_color(res_bar_x,res_bar_y+20,stam_bar_width,res_bar_y+40, c_black, c_black, c_black, c_black, true);//bar border
+    draw_rectangle_color(res_bar_x,res_bar_y+20,res_bar_x+stam_bar_width*(Player.current_stam/Player.max_stam),res_bar_y+40, c_yellow, c_yellow, c_yellow, c_yellow, false);//bar filling
     //S.E.
-    draw_rectangle_color(res_bar_x,res_bar_y+40,meta_bar_width,res_bar_y+60, c_black, c_black, c_black, c_black, true);
-    draw_rectangle_color(res_bar_x,res_bar_y+40,meta_bar_width,res_bar_y+60, c_blue, c_blue, c_blue, c_blue, false);
+    draw_rectangle_color(res_bar_x,res_bar_y+40,meta_bar_width,res_bar_y+60, c_black, c_black, c_black, c_black, true);//bar border
+    draw_rectangle_color(res_bar_x,res_bar_y+40,res_bar_x+meta_bar_width,res_bar_y+60, c_blue, c_blue, c_blue, c_blue, false);//bar filling
 }
 </string>
           </argument>

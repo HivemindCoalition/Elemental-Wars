@@ -273,7 +273,7 @@ if(DT_timer_active_D == 1)
 if(DT_timer_count_D &gt;= DT_timer_threshold_D)
 {
     DT_timer_active_D = 0;
-    DT_timer_coun_Dt = 0;
+    DT_timer_count_D = 0;
 }
 if(DT_timer_active_D == 0 &amp;&amp; !keyboard_check(ord("D")))
 {

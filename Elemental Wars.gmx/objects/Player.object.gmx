@@ -75,6 +75,32 @@ combat_move_state = 0;
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>///Step Timer Initialization
+//Everytime a movement ability is used, step counter counts down until next action can be input
+Step_timer_active = 0;
+Step_timer_count = 0;
+Step_timer_completed = false;
+first_step = true;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>///Facing/Aiming Initializtion
 
 //facing flags
@@ -107,9 +133,11 @@ aiming_dir = 0;//can be 0-359, and based on mouse position from player
             <string>///Physics Initialization
 
 //physics properties
-weight = 61; //based off metric system
+mass = 68; //based off metric system
 momentum_for = 0;
 momentum_dir = 0;
+run_accel = 0;
+sprint_accel = 0;
 </string>
           </argument>
         </arguments>
@@ -130,13 +158,122 @@ momentum_dir = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Abilities
+            <string>///Mobility Abilities
+//This includes basic movements such as walk/run/sprint, as well as advance acrobatics
+//Walking
+technique_mobility_walking = 1; //abilities will be objects as well down the road
+technique_walking_stepSpeed = 0.5;
+technique_walking_technique = 10;
+
+
 //Running
 technique_mobility_running = 1; //abilities will be objects as well down the road
-technique_running_stepSpeed = avail_agi;
-technique_running_stepForce = avail_str;
+technique_running_stepSpeed = 0.5;
+technique_running_technique = 10;
 
-technique_mobility_sprinting = 1;
+//Sprinting
+technique_mobility_sprintng = 1; //abilities will be objects as well down the road
+technique_sprinting_stepSpeed = 0.5;
+technique_sprinting_technique = 10;
+
+//ability derivative updates
+technique_walking_stepForce = avail_str * technique_walking_technique;//this is the amount of force put down on every step
+technique_running_stepForce = avail_str * technique_running_technique;//this is the amount of force put down on every step
+technique_sprinting_stepForce = avail_str * technique_sprinting_technique;//this is the amount of force put down on every step
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///State Flags
+on_ground = true;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Pixel Scale
+meter = 48;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Odometer Init
+max_meters_sec_prev = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="2">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Odometer
+meters_sec = (speed/meter)*room_speed;
+if(meters_sec &gt; max_meters_sec_prev)
+{
+    max_meters_sec_prev = meters_sec;
+}
 </string>
           </argument>
         </arguments>
@@ -224,10 +361,14 @@ Players running speed will accelerate until maximum move speed is reached
 
 switch(basic_move_state)
 {
-    case 0:
+    case 0://no state entered
+        if(on_ground == true)
+        {
+            friction = 0.1;
+        }
     break;
     case 1:
-        if(facing_left)
+        if(facing_left)//walking
         {
             x -= 1.5;
         }
@@ -237,9 +378,24 @@ switch(basic_move_state)
         }
     break;
     case 2:
-        if(facing_left)
+        if(facing_left)//running
         {
-            x -= 2.5;
+            if(first_step)//activate step timer on first step
+            {
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+                first_step = false;
+            }
+            else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+            {
+                hspeed += -technique_running_accel;
+                current_stam -= 10;
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+            }
+            else if(!first_step &amp;&amp; !Step_timer_completed)
+            {
+            }
         }
         else
         {
@@ -247,9 +403,23 @@ switch(basic_move_state)
         }
     break;
     case 3:
-        if(facing_left)
+        if(facing_left)//sprinting
         {
-            x -= 3.5;
+            if(first_step)//activate step timer on first step
+            {
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+                first_step = false;
+            }
+            else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+            {
+                hspeed += -technique_sprinting_accel;
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+            }
+            else if(!first_step &amp;&amp; !Step_timer_completed)
+            {
+            }
         }
         else
         {
@@ -267,9 +437,24 @@ switch(basic_move_state)
         }
     break;
     case 5:
-        if(facing_right)
+        if(facing_right)//running
         {
-            x += 2.5;
+            if(first_step)//activate step timer on first step
+            {
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+                first_step = false;
+            }
+            else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+            {
+                hspeed += technique_running_accel;
+                current_stam -= 10;
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+            }
+            else if(!first_step &amp;&amp; !Step_timer_completed)
+            {
+            }
         }
         else
         {
@@ -277,9 +462,24 @@ switch(basic_move_state)
         }
     break;
     case 6:
-        if(facing_right)
+        if(facing_right)//sprinting
         {
-            x += 3.5;
+            if(first_step)//activate step timer on first step
+            {
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+                first_step = false;
+            }
+            else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+            {
+                hspeed += technique_sprinting_accel;
+                Step_timer_count = technique_running_stepSpeed*room_speed;
+                Step_timer_active = 1;
+            }
+            else if(!first_step &amp;&amp; !Step_timer_completed)
+            {
+            }
+            
         }
         else
         {
@@ -311,9 +511,8 @@ switch(basic_move_state)
             <kind>1</kind>
             <string>///physics calculations
 //physics properties
-momentum_for_x = 0;
-momentum_for_y = 0;
 momentum_dir = direction;
+
 </string>
           </argument>
         </arguments>
@@ -334,7 +533,79 @@ momentum_dir = direction;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string></string>
+            <string>///basic acrobatics
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Mobility Abilities Updates
+//This includes basic movements such as walk/run/sprint, as well as advance acrobatics
+
+
+//ability derivative updates
+technique_walking_stepForce = avail_str * technique_walking_technique;//this is the amount of force put down on every step
+technique_walking_accel = technique_walking_stepForce/mass;
+
+technique_running_stepForce = avail_str * technique_running_technique;//this is the amount of force put down on every step
+technique_running_accel = technique_running_stepForce/mass;
+
+technique_sprinting_stepForce = avail_str * technique_sprinting_technique;//this is the amount of force put down on every step
+technique_sprinting_accel = technique_sprinting_stepForce/mass;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Step Timers and Behaviors
+//Step timer
+if((Step_timer_active == 1) &amp;&amp; Step_timer_completed)
+{
+    Step_timer_count--;
+    
+    Step_timer_completed = false;
+}
+else if(Step_timer_active == 1)
+{
+    Step_timer_count--;
+}
+
+if(Step_timer_count &lt;= 0)
+{
+    Step_timer_completed = true;
+    Step_timer_active = 0;
+}
+</string>
           </argument>
         </arguments>
       </action>
