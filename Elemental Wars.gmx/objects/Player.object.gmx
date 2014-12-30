@@ -158,16 +158,19 @@ run_accel = 0;
 sprint_accel = 0;
 
 //drag coefficient
-CD = 1;
+Cd = .6;
 //cross section area
-CA = 3.6*meter;
+CA = 2;
 //air density
-RA = 1.2;
+Ad = 1.2;
 
-drag = (1/2)*CD*CA*RA*(speed/meter);
+drag = -((1/2)*Ad*(speed/meter)*Cd*CA);
 
 //force variables
 max_force = 0;
+
+//potential variables for collision
+p_vspeed = 0;
 </string>
           </argument>
         </arguments>
@@ -196,20 +199,17 @@ sprinting = 0;
 
 
 //Walking
-technique_mobility_walking = 1; //abilities will be objects as well down the road
-technique_walking_stepSpeed = .30;
-technique_walking_technique = 1;
+technique_mobility_walking = 4; //abilities will be objects as well down the road
+technique_walking_stepSpeed = .45;
 
 
 //Running
 technique_mobility_running = 1; //abilities will be objects as well down the road
-technique_running_stepSpeed = 0.5;
-technique_running_technique = 1;
+technique_running_stepSpeed = 0.65;
 
 //Sprinting
-technique_mobility_sprintng = 1; //abilities will be objects as well down the road
-technique_sprinting_stepSpeed = 1;
-technique_sprinting_technique = 1;
+technique_mobility_sprinting = 1; //abilities will be objects as well down the road
+technique_sprinting_stepSpeed = .85;
 
 //power bar info
 //0-30 - walking
@@ -219,9 +219,49 @@ mobility_power_current = 0;//tracks bar progress
 mobility_power_used = 0;//indicates power used based on bar progress
 
 //ability derivative updates
-technique_walking_stepForce = avail_str * technique_walking_technique;//this is the amount of force put down on every step
-technique_running_stepForce = avail_str * technique_running_technique;//this is the amount of force put down on every step
-technique_sprinting_stepForce = avail_str * technique_sprinting_technique;//this is the amount of force put down on every step
+technique_walking_stepForce = mobility_power_used * technique_mobility_walking;//this is the amount of force put down on every step
+technique_running_stepForce = mobility_power_used * technique_mobility_running;//this is the amount of force put down on every step
+technique_sprinting_stepForce = mobility_power_used * technique_mobility_sprinting;//this is the amount of force put down on every step
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Acrobrobatic Abilities
+
+//This includes basic movements such as walk/run/sprint, as well as advance acrobatics
+jumping = 0;
+
+//Jumping
+technique_acrobatic_jumping = 1; //abilities will be objects as well down the road
+technique_jumping_stepSpeed = .30;
+
+
+
+//power bar info
+//0-30 - walking
+//30-80 - running
+//80-100 - sprinting
+acrobatic_power_current = 0;//tracks bar progress
+acrobatic_power_used = 0;//indicates power used based on bar progress
+
+//ability derivative updates
+technique_jumping_stepForce = avail_str * technique_acrobatic_jumping;//this is the amount of force put down on every step
 </string>
           </argument>
         </arguments>
@@ -266,6 +306,53 @@ on_ground = true;
             <kind>1</kind>
             <string>///Odometer Init
 max_meters_sec_prev = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///state machine variables
+basic_move_state = 0;
+acrobatic_move_state = 0;
+combat_move_state = 0;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Movement Variables
+hsp = 0;
+vsp = 0;
 </string>
           </argument>
         </arguments>
@@ -356,7 +443,40 @@ else
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Basic Movement State Machine
+            <string>///2D Collision Check
+
+//Ground Check
+if(place_meeting(x,y+1,Floor)){on_ground = true;}else{on_ground = false;}
+//ollision below
+if(vsp &gt; 0 &amp;&amp; place_meeting(x,y+vsp,Floor)){collision_below = true;}else{collision_below = false;}
+//collision above
+if(vsp &lt; 0 &amp;&amp; place_meeting(x,y+vsp,Floor)){collision_above = true;}else{collision_above = false;}
+
+
+
+if(hsp &gt; 0 &amp;&amp; place_meeting(x+hsp,y,Floor)){collision_right = true;}else{collision_right = false;}
+if(hsp &lt; 0 &amp;&amp; place_meeting(x+hsp,y,Floor)){collision_left = true;}else{collision_left = false;}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Basic Mobility State Machine
 
 /*
 Basic Movement State Machine
@@ -379,12 +499,12 @@ If you try to run or sprint going backwards, you will just walk
 Players running speed will accelerate until maximum move speed is reached
 */
 
-if(on_ground == true)
+if(on_ground)
 {
     switch(basic_move_state)
     {
         case 0://no state entered
-            friction = 0.1;
+            friction = 0.05;
             walking = 0;
             running = 0;
             sprinting = 0;
@@ -457,55 +577,30 @@ If you try to run or sprint going backwards, you will just walk
 /*
 Players running speed will accelerate until maximum move speed is reached
 */
-
-switch(acrobatic_move_state)
+if(on_ground)
 {
-    case 0://no state entered
-    break;
-    case 1:
-    break;
-    case 2:
-    break;
-    case 3:
-    break;
-    case 4:
-    break;
-    case 5:
-    break;
-    case 6:
-    break;
-    default:
-    ;
+    switch(acrobatic_move_state)
+    {
+        case 0://no state entered
+        jumping = 0;
+        break;
+        case 1:
+        jumping = 1;
+        break;
+        case 2:
+        break;
+        case 3:
+        break;
+        case 4:
+        break;
+        case 5:
+        break;
+        case 6:
+        break;
+        default:
+        ;
+    }
 }
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///physics calculations/updates
-//physics properties
-momentum_dir = direction;
-current_force = mass * speed/meter*meter;
-if(current_force &gt; max_force)
-{
-    max_force = current_force;
-}
-drag = (1/2)*CD*CA*RA*(speed/meter);
 </string>
           </argument>
         </arguments>
@@ -527,81 +622,130 @@ drag = (1/2)*CD*CA*RA*(speed/meter);
           <argument>
             <kind>1</kind>
             <string>///Mobility Ability behaviors
-//This includes basic movements such as walk/run/sprint, as well as advance acrobatics
+//The power bar will determine how much strength is being used with the mobility abilities
+//0-30 - walking
+//30-80 - running
+//80-100 - sprinting
+if(on_ground)
+{
+    if(walking == 1)
+    {
+        if(first_step)//activate step timer on first step
+        {
+            Step_timer_count = technique_walking_stepSpeed*room_speed;
+            Step_timer_active = 1;
+            first_step = false;
+        }
+        else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+        {
+            show_debug_message("entered walking");
+            mobility_power_used = 30;
+            //ability derivative updates
+            technique_walking_stepForce = mobility_power_used * technique_mobility_walking;//this is the amount of force put down on every step
+            technique_walking_accel = technique_walking_stepForce/mass;
+            hsp += cos(degtorad(facing_dir))*technique_walking_accel;
+            Step_timer_count = technique_walking_stepSpeed*room_speed;
+            Step_timer_active = 1;
+        }
+    }
+    if(running == 1)
+    {
+        if(first_step)//activate step timer on first step
+        {
+            Step_timer_count = technique_running_stepSpeed*room_speed;
+            Step_timer_active = 1;
+            first_step = false;
+        }
+        else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+        {
+            show_debug_message("entered running");
+            mobility_power_used = 65;
+            //ability derivative updates
+            technique_running_stepForce = mobility_power_used * technique_mobility_running;//this is the amount of force put down on every step
+            technique_running_accel = technique_running_stepForce/mass;
+            hsp += cos(degtorad(facing_dir))*technique_running_accel;
+            Step_timer_count = technique_running_stepSpeed*room_speed;
+            Step_timer_active = 1;
+        }
+    }
+    if(sprinting == 1)
+    {
+        if(first_step)//activate step timer on first step
+        {
+            Step_timer_count = technique_sprinting_stepSpeed*room_speed;
+            Step_timer_active = 1;
+            first_step = false;
+        }
+        else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+        {
+            show_debug_message("entered sprinting");
+            mobility_power_used = 90;
+            //ability derivative updates
+            technique_sprinting_stepForce = mobility_power_used * technique_mobility_sprinting;//this is the amount of force put down on every step
+            technique_sprinting_accel = technique_sprinting_stepForce/mass;
+            hsp += cos(degtorad(facing_dir))*technique_sprinting_accel;
+            Step_timer_count = technique_sprinting_stepSpeed*room_speed;
+            Step_timer_active = 1;
+        }
+    }
+}
+else{}
+
+
+
+//behaviors
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Acrobatic Ability Behaviors
+//This includes acrobatic movements such as jump/climb/swim, as well as advance acrobatics
 
 //power bar info
 //The power bar will determine how much strength is being used with the mobility abilities
 //0-30 - walking
 //30-80 - running
 //80-100 - sprinting
-mobility_power_used = avail_str*(mobility_power_current/100);
+acrobatic_power_used = avail_str*(acrobatic_power_current/100);
 
 //ability derivative updates
-technique_walking_stepForce = mobility_power_used * technique_walking_technique;//this is the amount of force put down on every step
-technique_walking_accel = technique_walking_stepForce/mass;
-
-technique_running_stepForce = mobility_power_used * technique_running_technique;//this is the amount of force put down on every step
-technique_running_accel = technique_running_stepForce/mass;
-
-technique_sprinting_stepForce = mobility_power_used * technique_sprinting_technique;//this is the amount of force put down on every step
-technique_sprinting_accel = technique_sprinting_stepForce/mass;
-
+technique_jumping_stepForce = acrobatic_power_used * technique_acrobatic_jumping;//this is the amount of force put down on every step
+technique_jumping_accel = technique_jumping_stepForce/mass;
 
 //behaviors
-if(walking == 1)
+if(on_ground)
 {
-    if(first_step)//activate step timer on first step
+    if(jumping == 1)
     {
-        Step_timer_count = technique_walking_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 30;
-        hspeed += cos(degtorad(facing_dir))*technique_walking_accel;
-        Step_timer_count = technique_walking_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-}
-if(running == 1)
-{
-    if(first_step)//activate step timer on first step
-    {
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 70;
-        hspeed += cos(degtorad(facing_dir))*technique_running_accel;
-        current_stam -= 10;
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-    else if(!first_step &amp;&amp; !Step_timer_completed)
-    {
-    }
-}
-if(sprinting == 1)
-{
-    if(first_step)//activate step timer on first step
-    {
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 90;
-        current_stam -= 20;
-        hspeed += cos(degtorad(facing_dir))*technique_sprinting_accel;
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-    else if(!first_step &amp;&amp; !Step_timer_completed)
-    {
+        if(first_step)//activate step timer on first step
+        {
+            Step_timer_count = technique_jumping_stepSpeed*room_speed;
+            Step_timer_active = 1;
+            first_step = false;
+        }
+        else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
+        {
+            acrobatic_power_current = 100;
+            vsp -= technique_jumping_accel;
+            Step_timer_count = technique_jumping_stepSpeed*room_speed;
+            Step_timer_active = 1;
+        }
     }
 }
 else{}
@@ -643,6 +787,14 @@ if(Step_timer_count &lt;= 0)
     Step_timer_completed = true;
     Step_timer_active = 0;
 }
+//reset first step and deactivate timer
+//if player stops moving and the step timer has finished from the last move
+//reactivate first step
+/*if(momentum == 0 &amp;&amp; Step_timer_completed == 1)
+{
+    first_step = true;
+    Step_timer_active = 0;
+}*/
 </string>
           </argument>
         </arguments>
@@ -663,108 +815,142 @@ if(Step_timer_count &lt;= 0)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Acrobatic Ability Behaviors
-//This includes acrobatic movements such as jump/climb/swim, as well as advance acrobatics
-
-//power bar info
-//The power bar will determine how much strength is being used with the mobility abilities
-//0-30 - walking
-//30-80 - running
-//80-100 - sprinting
-mobility_power_used = avail_str*(mobility_power_current/100);
-
-//ability derivative updates
-technique_walking_stepForce = mobility_power_used * technique_walking_technique;//this is the amount of force put down on every step
-technique_walking_accel = technique_walking_stepForce/mass;
-
-technique_running_stepForce = mobility_power_used * technique_running_technique;//this is the amount of force put down on every step
-technique_running_accel = technique_running_stepForce/mass;
-
-technique_sprinting_stepForce = mobility_power_used * technique_sprinting_technique;//this is the amount of force put down on every step
-technique_sprinting_accel = technique_sprinting_stepForce/mass;
-
-
-//behaviors
-if(walking == 1)
-{
-    if(first_step)//activate step timer on first step
-    {
-        Step_timer_count = technique_walking_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 30;
-        hspeed += cos(degtorad(facing_dir))*technique_walking_accel;
-        Step_timer_count = technique_walking_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-}
-if(running == 1)
-{
-    if(first_step)//activate step timer on first step
-    {
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 70;
-        hspeed += cos(degtorad(facing_dir))*technique_running_accel;
-        current_stam -= 10;
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-    else if(!first_step &amp;&amp; !Step_timer_completed)
-    {
-    }
-}
-if(sprinting == 1)
-{
-    if(first_step)//activate step timer on first step
-    {
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-        first_step = false;
-    }
-    else if(!first_step &amp;&amp; Step_timer_completed)//each step reloads and reactivates step timer
-    {
-        mobility_power_current = 90;
-        current_stam -= 20;
-        hspeed += cos(degtorad(facing_dir))*technique_sprinting_accel;
-        Step_timer_count = technique_running_stepSpeed*room_speed;
-        Step_timer_active = 1;
-    }
-    else if(!first_step &amp;&amp; !Step_timer_completed)
-    {
-    }
-}
-else{}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>if(current_stam &lt;= max_stam)
+            <string>///Stamina Regeneration
+if(current_stam &lt;= max_stam)
 {
     current_stam += 10/room_speed;
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Physics calculations/updates
+//Physics properties
+momentum_dir = direction;
+momentum = mass * speed/meter*meter;
+if(momentum &gt; max_force)
+{
+    max_force = momentum;
+}
+drag = -((1/2)*Ad*(speed/meter)*Cd*CA);
+
+//hspeed += (drag/mass)*cos(degtorad(facing_dir));
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Gravity
+if(!on_ground)
+{
+        grav += (9.8/meter)/room_speed;
+}
+else
+{
+    grav = 0;
+    vspeed = 0;
+}
+vsp += grav;
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Charge Bars
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="3" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///apply movement
+if(!collision_left)
+{
+    hspeed = hsp;
+}
+if(!collision_right)
+{
+    hspeed = hsp;
+}
+if(!collision_below)
+{
+    vspeed = vsp;
+}
+else
+{
+    move_contact_all(270, vsp);
+    vsp = 0;
+}
+if(!collision_above)
+{
+    vspeed = vsp;
+}
+else
+{
+    vsp = 0;
+    move_contact_all(90, vsp);
 }
 </string>
           </argument>
@@ -774,17 +960,19 @@ else{}
   </events>
   <PhysicsObject>0</PhysicsObject>
   <PhysicsObjectSensor>0</PhysicsObjectSensor>
-  <PhysicsObjectShape>0</PhysicsObjectShape>
-  <PhysicsObjectDensity>0.5</PhysicsObjectDensity>
-  <PhysicsObjectRestitution>0.100000001490116</PhysicsObjectRestitution>
+  <PhysicsObjectShape>1</PhysicsObjectShape>
+  <PhysicsObjectDensity>0</PhysicsObjectDensity>
+  <PhysicsObjectRestitution>0</PhysicsObjectRestitution>
   <PhysicsObjectGroup>0</PhysicsObjectGroup>
-  <PhysicsObjectLinearDamping>0.100000001490116</PhysicsObjectLinearDamping>
-  <PhysicsObjectAngularDamping>0.100000001490116</PhysicsObjectAngularDamping>
-  <PhysicsObjectFriction>0.200000002980232</PhysicsObjectFriction>
+  <PhysicsObjectLinearDamping>0</PhysicsObjectLinearDamping>
+  <PhysicsObjectAngularDamping>0</PhysicsObjectAngularDamping>
+  <PhysicsObjectFriction>0</PhysicsObjectFriction>
   <PhysicsObjectAwake>-1</PhysicsObjectAwake>
   <PhysicsObjectKinematic>0</PhysicsObjectKinematic>
   <PhysicsShapePoints>
     <point>0,0</point>
-    <point>32,32</point>
+    <point>32,0</point>
+    <point>32,64</point>
+    <point>0,64</point>
   </PhysicsShapePoints>
 </object>

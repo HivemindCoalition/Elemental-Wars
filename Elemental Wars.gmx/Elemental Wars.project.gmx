@@ -17,7 +17,7 @@
   <paths name="paths"/>
   <objects name="objects">
     <object>objects\Player</object>
-    <object>objects\Wall</object>
+    <object>objects\Floor</object>
     <objects name="Controllers">
       <object>objects\Game_Controller</object>
       <object>objects\Player_Contoller</object>
@@ -28,7 +28,7 @@
     <room>rooms\menu</room>
   </rooms>
   <constants number="2">
-    <constant name="GM_build_date">41998.9226446644</constant>
+    <constant name="GM_build_date">42003.1932028935</constant>
     <constant name="GM_version">'1.0.0.0'</constant>
   </constants>
   <help>

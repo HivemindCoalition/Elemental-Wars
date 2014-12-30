@@ -58,6 +58,11 @@ DT_timer_active_D = 0;
 DT_timer_threshold_D = 60; //.5 second double tap window
 DT_timer_count_D = 0;
 DT_press_count_D = 0;//tracks how many times a button is tapped up to 2
+//Space key
+DT_timer_active_Space = 0;
+DT_timer_threshold_Space = 60; //.5 second double tap window
+DT_timer_count_Space = 0;
+DT_press_count_Space = 0;//tracks how many times a button is tapped up to 2
 
 shift_toggle = 0;
 </string>
@@ -197,8 +202,20 @@ else
     walking = 0;
 }
 
-if(keyboard_check(ord("D")))
+//Space key interaction
+if(keyboard_check(vk_space) &amp;&amp; DT_press_count_Space &gt;= 2)
 {
+    //activate roll/dive/flip
+    Player.acrobatic_move_state = 0;// not added yet
+}
+else if(keyboard_check(vk_space) &amp;&amp; DT_press_count_Space &lt; 2)
+{
+    //activate jump
+    Player.acrobatic_move_state = 1;
+}
+else
+{
+    Player.acrobatic_move_state = 0;
 }
 
 if(keyboard_check(ord("W")))
@@ -278,6 +295,20 @@ if(DT_timer_count_D &gt;= DT_timer_threshold_D)
 if(DT_timer_active_D == 0 &amp;&amp; !keyboard_check(ord("D")))
 {
     DT_press_count_D = 0;
+}
+//Space timer
+if(DT_timer_active_Space == 1)
+{
+        DT_timer_count_Space++;
+}
+if(DT_timer_count_Space &gt;= DT_timer_threshold_Space)
+{
+    DT_timer_active_Space = 0;
+    DT_timer_count_Space = 0;
+}
+if(DT_timer_active_Space == 0 &amp;&amp; !keyboard_check(vk_space))
+{
+    DT_press_count_Space = 0;
 }
 </string>
           </argument>
