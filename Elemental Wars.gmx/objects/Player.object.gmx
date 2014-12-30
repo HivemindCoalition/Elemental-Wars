@@ -148,49 +148,6 @@ aiming_dir = 0;//can be 0-359, and based on mouse position from player
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Physics Initialization
-
-//physics properties
-mass = 68; //based off metric system
-momentum_for = 0;
-momentum_dir = 0;
-run_accel = 0;
-sprint_accel = 0;
-
-//drag coefficient
-Cd = .6;
-//cross section area
-CA = 2;
-//air density
-Ad = 1.2;
-
-drag = -((1/2)*Ad*(speed/meter)*Cd*CA);
-
-//force variables
-max_force = 0;
-
-//potential variables for collision
-p_vspeed = 0;
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
             <string>///Mobility Abilities
 //This includes basic movements such as walk/run/sprint, as well as advance acrobatics
 walking = 0;
@@ -305,6 +262,7 @@ on_ground = true;
           <argument>
             <kind>1</kind>
             <string>///Odometer Init
+meters_sec = 0;
 max_meters_sec_prev = 0;
 </string>
           </argument>
@@ -352,13 +310,18 @@ combat_move_state = 0;
             <kind>1</kind>
             <string>///Movement Variables
 hsp = 0;
+hsp_pps = 0;
+hsp_mps = 0;
 vsp = 0;
+vsp_pps = 0;
+vsp_mps = 0;
+tsp = 0;
+tsp_pps = 0;
+tsp_mps = 0;
 </string>
           </argument>
         </arguments>
       </action>
-    </event>
-    <event eventtype="3" enumb="2">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -375,12 +338,34 @@ vsp = 0;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Odometer
-meters_sec = (speed/meter)*room_speed;
-if(meters_sec &gt; max_meters_sec_prev)
-{
-    max_meters_sec_prev = meters_sec;
-}
+            <string>///Physics Variables Initialization
+
+//physics properties
+mass = 68; //based off metric system
+momentum_for = 0;
+momentum_dir = 0;
+max_force = 0;
+run_accel = 0;
+sprint_accel = 0;
+
+//friction
+fric = .02;
+//gravity
+grav = 0;
+//drag coefficient
+Cd = 1;
+//cross section area
+CA = 2;
+//air density
+Ad = 1.2;
+
+drag = 0;
+drag_movement = 0;
+//force variables
+max_force = 0;
+
+//potential variables for collision
+p_vspeed = 0;
 </string>
           </argument>
         </arguments>
@@ -453,8 +438,9 @@ if(vsp &gt; 0 &amp;&amp; place_meeting(x,y+vsp,Floor)){collision_below = true;}e
 if(vsp &lt; 0 &amp;&amp; place_meeting(x,y+vsp,Floor)){collision_above = true;}else{collision_above = false;}
 
 
-
+//collision right
 if(hsp &gt; 0 &amp;&amp; place_meeting(x+hsp,y,Floor)){collision_right = true;}else{collision_right = false;}
+//collision left
 if(hsp &lt; 0 &amp;&amp; place_meeting(x+hsp,y,Floor)){collision_left = true;}else{collision_left = false;}
 </string>
           </argument>
@@ -504,7 +490,7 @@ if(on_ground)
     switch(basic_move_state)
     {
         case 0://no state entered
-            friction = 0.05;
+            //friction = 0.05;
             walking = 0;
             running = 0;
             sprinting = 0;
@@ -648,7 +634,7 @@ if(on_ground)
             Step_timer_active = 1;
         }
     }
-    if(running == 1)
+    else if(running == 1)
     {
         if(first_step)//activate step timer on first step
         {
@@ -668,7 +654,7 @@ if(on_ground)
             Step_timer_active = 1;
         }
     }
-    if(sprinting == 1)
+    else if(sprinting == 1)
     {
         if(first_step)//activate step timer on first step
         {
@@ -688,10 +674,14 @@ if(on_ground)
             Step_timer_active = 1;
         }
     }
+    else{mobility_power_used = 0;}
 }
 else{}
 
-
+if(basic_move_state != 0 &amp;&amp; mobility_power_current &lt; 100)
+{mobility_power_current++;}
+else if(basic_move_state == 0 &amp;&amp; mobility_power_current &gt; 0)
+{mobility_power_current--;}
 
 //behaviors
 </string>
@@ -840,37 +830,6 @@ if(current_stam &lt;= max_stam)
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>///Physics calculations/updates
-//Physics properties
-momentum_dir = direction;
-momentum = mass * speed/meter*meter;
-if(momentum &gt; max_force)
-{
-    max_force = momentum;
-}
-drag = -((1/2)*Ad*(speed/meter)*Cd*CA);
-
-//hspeed += (drag/mass)*cos(degtorad(facing_dir));
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
             <string>///Gravity
 if(!on_ground)
 {
@@ -882,27 +841,6 @@ else
     vspeed = 0;
 }
 vsp += grav;
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Charge Bars
 </string>
           </argument>
         </arguments>
@@ -925,14 +863,119 @@ vsp += grav;
         <arguments>
           <argument>
             <kind>1</kind>
+            <string>///Odometer
+//updating speed values
+tsp = sqrt((sqr(x-(x+hsp)))+(sqr(y-(y+vsp))));
+hsp_pps = hsp*room_speed;
+vsp_pps = vsp*room_speed;
+tsp_pps = tsp*room_speed;
+hsp_mps = hsp/meter*room_speed;
+vsp_mps = vsp/meter*room_speed;
+tsp_mps = tsp/meter*room_speed;
+meters_sec = tsp/meter;
+if(meters_sec &gt; max_meters_sec_prev)
+{
+    max_meters_sec_prev = meters_sec;
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Physics calculations/updates
+//Physics properties
+momentum_dir = direction;
+momentum_for = mass * tsp_mps;
+if(momentum_for &gt; max_force)
+{
+    max_force = momentum_for;
+}
+if(tsp &gt; 0.05)
+{
+    drag = -((1/2)*Ad*(tsp_mps)*Cd*CA);
+    drag_movement = drag/mass/60;
+    drag_dir = direction-180;
+}
+else
+{
+    drag = 0;
+    drag_movement = 0;
+    drag_dir = direction;
+}
+
+hsp += drag_movement*cos(degtorad(drag_dir));
+vsp += drag_movement*sin(degtorad(drag_dir));
+
+//friction
+if(on_ground)
+{
+    if(hsp &gt; 0 + fric)
+    {
+        hsp -= fric;
+    }
+    else if(hsp &lt; 0 - fric)
+    {
+        hsp += fric;
+    }
+    else
+    {hsp = 0}
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
             <string>///apply movement
+
 if(!collision_left)
 {
     hspeed = hsp;
 }
+else
+{
+    move_contact_all(180, hsp);
+    hspeed = 0;
+    hsp = 0;
+}
 if(!collision_right)
 {
     hspeed = hsp;
+}
+else
+{
+    move_contact_all(0, hsp);
+    hspeed = 0;
+    hsp = 0;
 }
 if(!collision_below)
 {
@@ -941,6 +984,7 @@ if(!collision_below)
 else
 {
     move_contact_all(270, vsp);
+    vspeed = 0;
     vsp = 0;
 }
 if(!collision_above)
@@ -950,8 +994,60 @@ if(!collision_above)
 else
 {
     vsp = 0;
+    vspeed = 0;
     move_contact_all(90, vsp);
 }
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="8" enumb="0">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Player ability bars
+//Draw Movement Bar for basic movement
+if(mobility_power_current != 0)
+{
+    draw_rectangle_color(x-20,y+37,x+20,y+47, c_black, c_black, c_black, c_black, true);
+    draw_rectangle_color(x-20,y+37,(x-20)+(40*(mobility_power_current/100)),y+47, c_black, c_black, c_black, c_black, false);
+}
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>///Player Draw
+draw_sprite(Player_Placeholder,0,x,y)
 </string>
           </argument>
         </arguments>

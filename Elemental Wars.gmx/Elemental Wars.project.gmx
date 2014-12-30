@@ -10,7 +10,7 @@
     <sprite>sprites\Button_End_Turn</sprite>
     <sprite>sprites\Button_Menu</sprite>
     <sprite>sprites\Button_Start</sprite>
-    <sprite>sprites\Wall_Stone</sprite>
+    <sprite>sprites\Floor_Stone</sprite>
     <sprite>sprites\Player_Placeholder</sprite>
   </sprites>
   <backgrounds name="background"/>
@@ -18,6 +18,7 @@
   <objects name="objects">
     <object>objects\Player</object>
     <object>objects\Floor</object>
+    <object>objects\Wall</object>
     <objects name="Controllers">
       <object>objects\Game_Controller</object>
       <object>objects\Player_Contoller</object>
@@ -28,7 +29,7 @@
     <room>rooms\menu</room>
   </rooms>
   <constants number="2">
-    <constant name="GM_build_date">42003.1932028935</constant>
+    <constant name="GM_build_date">42003.9398174769</constant>
     <constant name="GM_version">'1.0.0.0'</constant>
   </constants>
   <help>
